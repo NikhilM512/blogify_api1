@@ -27,8 +27,22 @@ const getAllPosts = (req,res) => {
     }
 
 
-    res.json({ posts });
+    // res.json({ posts });
+    res.status(200).json({
+    success: true,
+    message: 'All posts fetched successfully',
+    data:{posts}
+    });
 }
 
 
-module.exports = {getAllPosts}
+const getPostById=(req,res)=>{
+    const postId= req.params.id;
+    res.status(200).json({
+    success: true,
+    data: { postId: postId }
+});
+}
+
+
+module.exports = {getAllPosts,getPostById}
