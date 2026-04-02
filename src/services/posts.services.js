@@ -80,13 +80,34 @@ const updatePost = async (postId, updateData) => {
   return updatedPost;
 };
 
-const deletePost = async (postId) => {
+const deletePost = async (postId,currentUserId) => {
   // console.log(req.params.id)
   const post = await Post.findById(postId);
-  console.log(post,"ard",postId)
+  // console.log(post,"ard",postId)
   // if (post.userId.toString() !== req.user.id) {
   //   return res.status(403).json({ error: "You cannot delete someone else's post" });
   // }
+  // if(req.user)
+  // console.log(req.user.id)
+  // if(req.user.id!==post.author.toString()){
+  //   return res.status(401).json({
+  //     success:false,
+  //     message:"Not authorized"
+  //   })
+  // }
+  // if (req.user.id!==)
+  // if (post.author.toString()!==currentUserId){
+  //   return res.status(403).json({
+  //     success: false,
+  //       message: 'You are not authorized to delete this post'
+  //   })
+  // }
+
+  // 69ca39d33a7eae907d89ccbd
+  // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Y2EzOWQzM2E3ZWFlOTA3ZDg5Y2NiZCIsInVzZXJuYW1lIjoicHJpeWFuc2h1IiwiaWF0IjoxNzc0ODYwODI1LCJleHAiOjE3NzQ4NjQ0MjV9.xFYvzcaY_soe3oueuWLpJTjmQkCMMXXD_g4iYJFxI4A
+  
+  // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Y2ExZTExOGIxMTY1YzkyMTAwNzY1NSIsInVzZXJuYW1lIjoiYmhhdmlzaDEyMyIsImlhdCI6MTc3NDg2MTE1MywiZXhwIjoxNzc0ODY0NzUzfQ.QZmcUX3ncjt6bg-hmIeAyJ7z_Mv13AEDiScNcuSvPhk
+
   const deletedPost = await Post.findByIdAndDelete(postId);
   if (!deletedPost) {
     throw { status: 404, message: `Post with ID ${postId} not found` };

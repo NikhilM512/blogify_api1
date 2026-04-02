@@ -4,17 +4,28 @@ const cors = require("cors");
 const app = express();
 const connectDB = require("./config/db.js");
 const mongoose = require("mongoose");
-const User = require("./models/users.model.js");
+const User = require("./models/user.model.js");
 const bcrypt = require("bcrypt");
-const productModel = require("./models/product.model.js");
+const jwt = require("jsonwebtoken")
 const { Tag } = require("./models/post.model.js");
-
+const mainRouter = require("./routes/index.js");
+const cookieParser = require('cookie-parser');
 require("dotenv").config();
-// const userRoutes = require("./routes/users.routes.js")
+ const { validationResult } = require('express-validator');
+const { body } = require('express-validator');
+const registrationRules = [
+  // email must be a valid email
+  body('email').isEmail().withMessage('Please provide a valid email address'),
+  
+  // password must be at least 5 chars long
+  body('password').isLength({ min: 5 }).withMessage('Password must be at least 5 characters long')
+];
+
 
 app.use(cors());
-
 app.use(express.json());
+app.use(cookieParser());
+
 
 const PORT = process.env.PORT || 7000;
 
@@ -22,95 +33,56 @@ const PORT = process.env.PORT || 7000;
 connectDB();
 
 
+app.post("/register",registrationRules,(req,res)=>{
+    try {
+
+        let {email,username,password}=req.body;
+       
+
+         const errors = validationResult(req);
+  
+  // 3. If there are errors, send a 400 Bad Request response
+      if (!errors.isEmpty()) {
+        // 400 Bad Request is the correct status code for a client-side validation error
+        return res.status(400).json({ errors: errors.array() });
+      }
+        // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // if (!emailRegex.test(email)) {
+        //   return res.status(400).json({ msg: "Email is incorrect!" });
+        // }
+
+        // if (!/[A-Z]/.test(password)) {
+        //   return res.status(400).json({ msg: "Password must contain at least one uppercase letter" });
+        // }
+        // if (!/[0-9]/.test(password)) {
+        //   return res.status(400).json({ msg: "Password must contain at least one digit" });
+        // }
+        // if (!/[!@#$%^&*]/.test(password)) {
+        //   return res.status(400).json({ msg: "Password must contain at least one special character" });
+        // }
+
+        // if(!email.includes('@')){
+        //     res.status(400).json({"msg":"Email is incorrect!"})
+        // }
+        // if(password.length<8 || password.length>16){
+        //     res.status(400).json({"Msg":"Password length should be between 8-16 characters"})
+        // }
+
+        res.send("Registered")
+
+    } catch (error) {
+      res.json({error:error.message})
+    }
+})
+
+
 app.get('/', (req, res) => {
     res.status(200).send("Welcome to the Blogify API!")
 })
 
 
-app.use('/api/v1/posts', postsRoutes);
+app.use('/api/v1', mainRouter);
 
-app.post('/api/v1/tags',async (req,res,next)=>{
-  try{
-    let {name,description} = req.body;
-    
-    let tag = await new Tag({name,description});
-    tag.save();
-    res.status(201).json(tag)
-  }catch(err){
-      next(err)
-  }
-})
-
-// app.use("/api/v1/user",userRoutes);
-
-app.post("/api/v1/users",async(req,res,next)=>{
-    try{
-      const {username,firstName,lastName,email,password,DOB} = req.body;
-      
-      let sending_data={username,firstName,lastName,email,password,DOB};
-      // let data=await User.create(sending_data);
-      
-      const user = new User(sending_data);
-      user.firstName = 'Alice';
-      user.lastName ="Johnson";
-      await user.save();
-      
-      console.log(user.fullName);
-      res.status(201).json({"Message":"Successfully posted the Data",data:user})
-    }catch(err){
-        next(err);
-    }
-});
-
-
-app.post("/api/v1/products",async(req,res,next)=>{
-    try{
-      const {name,price,description} = req.body;
-      // let saltRounds = 10; 
-      // const hashedPassword = await bcrypt.hash(password,saltRounds)
-      let sending_data={name,price,description};
-      let data=await productModel.create(sending_data);
-      console.log(data)
-      res.status(201).json({"Message":"Successfully posted the Data",data})
-    }catch(err){
-        next(err)
-    }
-});
-
-
-app.get('/api/v1/users',async(req,res,next)=>{
-  try{
-    const user = await User.findOne({fullName:"Aligf Xyz9"});
-    console.log(user.fullName)
-    res.status(200).json({data:user})
-  }catch(err){
-    next(err)
-  }
-})
-
-
-app.get('/api/v1/products',async(req,res)=>{
-  try{
-    let users = await productModel.find({})
-    res.status(200).json({data:users})
-  }catch(err){
-    next(err)
-  }
-});
-
-
-app.post("/api/v1/products",async(req,res,next)=>{
-    try{
-      const {name} = req.body;
-      // let saltRounds = 10
-      // const hashedPassword = await bcrypt.hash(password,saltRounds)
-      let sending_data={name};
-      let data=await productModel.create(sending_data);
-      res.status(201).json({"Message":"Successfully posted the Data",data})
-    }catch(err){
-        next(err)
-    }
-});
 
 
 
