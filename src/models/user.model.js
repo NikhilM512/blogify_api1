@@ -3,21 +3,49 @@ const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema(
   {
-    username: { type: String, required: true, unique: true, trim: true },
-    firstName:String,
-    lastName:String,
-    // fullName:
-    email: { type: String, required: true, unique: true, trim: true, lowercase: true },
-    password: {type:String,required:true},
-    DOB:Date
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true, // Mongoose will create an index to enforce uniqueness
+      lowercase: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-   {
-  toJSON: { virtuals: true },   // Include virtuals in JSON
-  toObject: { virtuals: true }  // Include virtuals in objects
-},
-  { timestamps: true }
-
+  {
+    timestamps: true,
+  }
 );
+
+// const User = mongoose.model('User', userSchema);
+
+// module.exports = User;
+
+// const userSchema = new mongoose.Schema(
+//   {
+//     username: { type: String, required: true, unique: true, trim: true },
+//     firstName:String,
+//     lastName:String,
+//     // fullName:
+//     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
+//     password: {type:String,required:true},
+//     DOB:Date
+//   },
+//    {
+//   toJSON: { virtuals: true },   // Include virtuals in JSON
+//   toObject: { virtuals: true }  // Include virtuals in objects
+// },
+//   { timestamps: true }
+
+// );
 
 userSchema.virtual('fullName').get(function() {
   return `${this.firstName} ${this.lastName}`;

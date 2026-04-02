@@ -1,5 +1,6 @@
 
 // const { Tag } = require('../models/post.model.js');
+const { Post } = require('../models/post.model.js');
 const postService = require('../services/posts.services.js');
 
 const getAllPosts = async (req, res, next) => {
@@ -44,13 +45,53 @@ const updatePost = async (req, res, next) => {
 };
 
 const deletePost = async (req, res, next) => {
-  try {
+   try {
     const postId = req.params.id;
-    await postService.deletePost(postId);
-    res.status(200).json({ success: true, message: 'Post deleted successfully' });
-  } catch (err) {
-    next(err)
+    const currentUserId = req.user.id; // From the middleware
+
+    // 1. Find the post first (don't delete it yet!)
+    const post = await Post.findById(postId);
+
+    // 2. Check if post exists
+    if (!post) {
+      return res.status(404).json({ success: false, message: 'Post not found' });
+    }
+
+    // 3. AUTHORIZATION CHECK
+    // Compare the post's author ID with the requesting user's ID.
+    // We use .toString() because MongoDB ObjectIds are objects, not strings.
+    if (post.author.toString() !== currentUserId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You are not authorized to delete this post'
+      });
+    }
+
+    // 4. If we pass the check, delete the post
+    await post.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: 'Post deleted successfully'
+    });
+
+  } catch (error) {
+    next(error);
   }
+  // try {
+  //   const postId = req.params.id;
+  //   let currentUserId=req.user.id
+  //   if (post.author.toString() !== currentUserId) {
+  //     return res.status(403).json({
+  //       success: false,
+  //       message: 'You are not authorized to delete this post'
+  //     });
+  //   }
+  //   await postService.deletePost(postId,currentUserId);
+  //   res.status(200).json({ success: true, message: 'Post deleted successfully' });
+  // } catch (err) {
+  //   next(err)
+  // }
 };
 
 module.exports = {
