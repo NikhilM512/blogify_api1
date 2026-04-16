@@ -18,4 +18,5 @@ const registrationRules = [
 router.post('/register', registrationRules, authController.registerUser);
 router.get('/practice-token', authController.practiceTokenGeneration)
 router.post("/login", authController.loginUser)
+router.post('/logout', authController.logoutUser);
 module.exports = router;
