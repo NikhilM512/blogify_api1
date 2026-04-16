@@ -32,7 +32,7 @@ const getAllPosts = async (queryParams) => {
     .sort(sortOptions)
     .skip(skipValue)
     .limit(limitValue)
-    .populate('tags'); // We can still populate!
+    .populate('author'); // We can still populate!
 
   return posts;
 };

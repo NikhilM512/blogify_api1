@@ -5,6 +5,20 @@ const jwt = require('jsonwebtoken');
 require("dotenv").config();
 
 
+const logoutUser = (req, res) => {
+  // Clear the 'accessToken' cookie
+  res.clearCookie('accessToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production'
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Logged out successfully'
+  });
+};
+
+
 const loginUser=async (req,res,next)=>{
     try{
       const {email,password}=req.body;
@@ -53,7 +67,7 @@ const loginUser=async (req,res,next)=>{
       let token = jwt.sign(payload,secret_key,option);
 
       res.status(200)
-      .cookie('token',token,options)
+      .cookie('accessToken',token,options)
       .json({
         success:true,
         message:"Hurray! User logged-In Successfully...!!!",
@@ -167,5 +181,5 @@ const registerUser = async (req, res, next) => {
 };
 
 module.exports = {
-  registerUser,practiceTokenGeneration,loginUser
+  registerUser,practiceTokenGeneration,loginUser, logoutUser
 };
